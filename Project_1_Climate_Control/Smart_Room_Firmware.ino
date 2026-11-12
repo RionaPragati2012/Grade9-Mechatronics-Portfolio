@@ -6,11 +6,11 @@
 #define DHTPIN 2       // Temperature & Humidity sensor data pin
 #define DHTTYPE DHT11  // Sensor model
 #define LIGHT_PIN A0   // Photoresistor (light sensor) analog pin
-#define SERVO_PIN 9    // SG90 Servo motor control pin
-#define LED_PIN 13     // Night-light LED pin
+#define SERVO_PIN 9    // SG90 Servo motor control pin (Window/Vent)
+#define FAN_PIN 10     // DC Cooling Fan motor control pin
+#define LED_PIN 13     // Room Ceiling Light LED pin
 
 // 2. Initialize System Components
-// Standard 16-pin LCD wiring pins: (RS, E, D4, D5, D6, D7)
 LiquidCrystal lcd(12, 11, 5, 4, 3, 6); 
 DHT dht(DHTPIN, DHTTYPE);
 Servo ventServo;
@@ -26,8 +26,10 @@ void setup() {
   ventServo.attach(SERVO_PIN);
   ventServo.write(0); 
   
-  // Prepare the LED pin to send power out
-  pinMode(LED_PIN, OUTPUT); 
+  // Prepare both the Room Light pin and the Fan pin to send power out
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(FAN_PIN, OUTPUT);
+  digitalWrite(FAN_PIN, LOW); // Make sure the fan starts OFF
 }
 
 void loop() {
@@ -48,14 +50,16 @@ void loop() {
   lcd.setCursor(0, 1);
   lcd.print("Light: " + String(lightVal) + "    ");
 
-  // 5. Acting (Climate): Open vent if temp goes above 22.5°C
+  // 5. Acting (Climate): Open window AND spin cooling fan if temp > 22.5°C
   if (temp > 22.5) { 
-    ventServo.write(90); 
+    ventServo.write(90);          // Swing window/vent open
+    digitalWrite(FAN_PIN, HIGH);  // Turn cooling fan ON
   } else {
-    ventServo.write(0);  
+    ventServo.write(0);           // Close window/vent
+    digitalWrite(FAN_PIN, LOW);   // Turn cooling fan OFF
   }
 
-  // 6. Acting (Lighting): Turn LED ON if room gets dark (below 400)
+  // 6. Acting (Lighting): Turn Room Light ON if room gets dark (below 400)
   if (lightVal < 400) {
     digitalWrite(LED_PIN, HIGH); 
   } else {
