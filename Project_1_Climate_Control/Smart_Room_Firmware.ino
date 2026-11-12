@@ -1,59 +1,67 @@
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
+#include <LiquidCrystal.h>
 #include <Servo.h>
 #include <DHT.h>
 
-// Hardware Pin Configurations
-#define DHTPIN 2
-#define DHTTYPE DHT11
-#define LIGHT_PIN A0
-#define SERVO_PIN 9
+// 1. Hardware Pin Configurations
+#define DHTPIN 2       // Temperature & Humidity sensor data pin
+#define DHTTYPE DHT11  // Sensor model
+#define LIGHT_PIN A0   // Photoresistor (light sensor) analog pin
+#define SERVO_PIN 9    // SG90 Servo motor control pin
+#define LED_PIN 13     // Night-light LED pin
 
-// Initialize System Components
+// 2. Initialize System Components
+// Standard 16-pin LCD wiring pins: (RS, E, D4, D5, D6, D7)
+LiquidCrystal lcd(12, 11, 5, 4, 3, 6); 
 DHT dht(DHTPIN, DHTTYPE);
-LiquidCrystal_I2C lcd(0x27, 16, 2); // 0x27 is the standard I2C address for these screens
 Servo ventServo;
 
 void setup() {
-  // Start the USB Serial communication back to your laptop
   Serial.begin(9600);
   
-  // Initialize the physical hardware modules
+  // Start the sensors and the 16-column, 2-row LCD screen
   dht.begin();
-  lcd.init();
-  lcd.backlight();
+  lcd.begin(16, 2); 
   
-  // Attach the servo motor to its control pin and set it to 0 degrees (Closed)
+  // Attach the servo motor and set it to 0 degrees (Closed)
   ventServo.attach(SERVO_PIN);
   ventServo.write(0); 
+  
+  // Prepare the LED pin to send power out
+  pinMode(LED_PIN, OUTPUT); 
 }
 
 void loop() {
-  // 1. Telemetry Data Gathering (Sensing)
+  // 3. Sensing: Read temperature and light levels
   float temp = dht.readTemperature();
   int lightVal = analogRead(LIGHT_PIN);
 
-  // Error Safeguard: If the sensor fails or is unplugged, alert the screen
+  // Safeguard: Show an error message if the temp sensor comes unplugged
   if (isnan(temp)) {
     lcd.setCursor(0, 0);
     lcd.print("Sensor Error   ");
     return;
   }
 
-  // 2. Human-Machine Interface Output (Displaying)
+  // 4. Displaying: Print live numbers onto the LCD screen
   lcd.setCursor(0, 0);
   lcd.print("Temp: " + String(temp, 1) + "C   ");
   lcd.setCursor(0, 1);
   lcd.print("Light: " + String(lightVal) + "    ");
 
-  // 3. Closed-Loop Decision Automation (Acting)
-  // If the room temperature exceeds 22.5 degrees Celsius:
+  // 5. Acting (Climate): Open vent if temp goes above 22.5°C
   if (temp > 22.5) { 
-    ventServo.write(90); // Rotate the actuator 90 degrees to mechanically open the vent
+    ventServo.write(90); 
   } else {
-    ventServo.write(0);  // Return the actuator to 0 degrees to close the vent
+    ventServo.write(0);  
   }
 
-  // Wait 2 seconds (2000 milliseconds) before running the loop again
+  // 6. Acting (Lighting): Turn LED ON if room gets dark (below 400)
+  if (lightVal < 400) {
+    digitalWrite(LED_PIN, HIGH); 
+  } else {
+    digitalWrite(LED_PIN, LOW);  
+  }
+
+  // Pause 2 seconds before repeating the loop
   delay(2000); 
 }
