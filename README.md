@@ -5,23 +5,17 @@ Welcome to my engineering development space. This repository contains the source
 ---
 
 ## 📁 Project 1: Smart Room Climate & Lighting Controller
-An automated, closed-loop environmental control unit that reads real-time sensor data to actuate mechanical systems.
+An automated, closed-loop environmental control unit that reads real-time sensor data to actuate mechanical and lighting systems.
 
 ### ⚙️ System Architecture & Wiring
 *   **Microcontroller:** Arduino Uno R3
 *   **Telemetry Inputs:** DHT11 Temperature & Humidity Sensor, Photoresistor (LDR)
-*   **Mechanical Actuator:** SG90 Micro Servo Motor
-*   **User Interface:** 16x2 LCD Display via I2C protocol
+*   **Mechanical & Lighting Outputs:** SG90 Micro Servo Motor, Status LED (Pin 13)
+*   **User Interface:** 16x2 LCD Display (4-bit parallel interface)
 
 ### 📸 Media Evidence
 *   **Circuit Schematic:** `[Link or upload your top-down wiring photo here]`
 *   **Video Demo:** `[Link to your YouTube or Google Drive 60-second video demo here]`
 
 ### 🧠 Logic Loop Explanation
-The firmware monitors environmental variables every 2 seconds. If the ambient temperature crosses a threshold (>24.0°C), the micro-controller triggers a 90-degree servo rotation to open a physical cooling vent flap.
-
----
-
-## 🏎️ Project 2: Autonomous Obstacle-Avoiding Rover
-*(Coming Soon)* A differential-drive robotic rover utilizing proximity mapping algorithms to navigate spaces autonomously.
-\\\\\\\\\\\\\\\\\\\\\\\\\\
+The firmware monitors environmental variables every 2 seconds. If the ambient temperature crosses a threshold (>22.5°C), the microcontroller triggers a 90-degree servo rotation to open a physical cooling vent flap. Additionally, if room brightness drops below a set threshold (<400), the system automatically activates an LED night-light.
