@@ -1,6 +1,6 @@
 # Grade 9 Mechatronics & Robotics Portfolio 🤖🚀
 
-Welcome to my engineering development space. This repository contains the source code, schematics, and system documentation for mechatronics prototypes built during Grade 9 as part of my pathway toward becoming a Robotics Engineering.
+Welcome to my engineering development space. This repository contains the source code, schematics, and system documentation for mechatronics prototypes built during Grade 9 as part of my pathway toward studying Mechatronics Engineering.
 
 ---
 
